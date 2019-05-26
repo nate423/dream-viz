@@ -5,7 +5,7 @@ var five = require('johnny-five'),
   potentiometer;
 
 const board = new five.Board();
-var socket = io.connect('localhost:8080', { reconnect: true });
+var socket = io.connect('localhost:3000', { reconnect: true });
 
 board.on('ready', function() {
   // Create a new `potentiometer` hardware instance.
