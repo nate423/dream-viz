@@ -31,9 +31,9 @@ io.on('connection', (socket) => {
   });
 });
 
-io.on('potentiometer', (data) => {
-  console.log(data);
-  io.emit('value', data.content.value);
+io.on('potentiometer', (value) => {
+  console.log(value);
+  io.emit('value', value);
 });
 
 http.listen(process.env.PORT || SERVER_PORT, () => {
