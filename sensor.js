@@ -1,13 +1,15 @@
-var five = require("johnny-five"),
-  board, potentiometer;
+const dweetClient = require('node-dweetio');
 
-board = new five.Board();
+var five = require('johnny-five'),
+  potentiometer;
 
-board.on("ready", function() {
+const board = new five.Board();
+const dweetio = new dweetClient();
 
+board.on('ready', function() {
   // Create a new `potentiometer` hardware instance.
   potentiometer = new five.Sensor({
-    pin: "A0",
+    pin: 'A0',
     freq: 250
   });
 
@@ -19,13 +21,20 @@ board.on("ready", function() {
   });
 
   // "data" get the current reading from the potentiometer
-  potentiometer.on("change", function() {
+  potentiometer.on('change', function() {
     console.log(this.value);
+    const value = this.value;
+    dweetio.dweet_for('value', { value }, (err, dweet) => {
+      if (err) {
+        console.log('[Error]: ', err);
+      }
+      if (dweet) {
+        console.log(dweet.content);
+      }
+    });
   });
 });
-
 
 // References
 //
 // http://arduino.cc/en/Tutorial/AnalogInput
-
