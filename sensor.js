@@ -1,10 +1,11 @@
-const dweetClient = require('node-dweetio');
+// Connect to server
+var io = require('socket.io-client');
 
 var five = require('johnny-five'),
   potentiometer;
 
 const board = new five.Board();
-const dweetio = new dweetClient();
+var socket = io.connect('localhost:8080', { reconnect: true });
 
 board.on('ready', function() {
   // Create a new `potentiometer` hardware instance.
@@ -23,15 +24,9 @@ board.on('ready', function() {
   // "data" get the current reading from the potentiometer
   potentiometer.on('change', function() {
     console.log(this.value);
-    const value = this.value;
-    dweetio.dweet_for('value', { value }, (err, dweet) => {
-      if (err) {
-        console.log('[Error]: ', err);
-      }
-      if (dweet) {
-        console.log(dweet.content);
-      }
-    });
+
+    // Add a connect listener
+    socket.emit('potentiometer', this.value);
   });
 });
 

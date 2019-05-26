@@ -171,5 +171,5 @@ logoImage.src = 'profile.png';
 
 socket.on('value', (value) => {
   console.log(value);
-  jitter += value;
+  jitter = value;
 });
