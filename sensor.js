@@ -11,7 +11,7 @@ board.on('ready', function() {
   // Create a new `potentiometer` hardware instance.
   potentiometer = new five.Sensor({
     pin: 'A0',
-    freq: 250
+    freq: 100
   });
 
   // Inject the `sensor` hardware into
@@ -22,7 +22,7 @@ board.on('ready', function() {
   });
 
   // "data" get the current reading from the potentiometer
-  potentiometer.on('change', function() {
+  potentiometer.on('data', function() {
     console.log(this.value);
 
     // Add a connect listener
