@@ -5,8 +5,10 @@
         "start": "node app.js"
     },
     "dependencies": {
+        "bezier-easing": "^2.1.0",
         "body-parse": "^0.1.0",
         "express": "^4.17.1",
+        "inquirer": "^6.3.1",
         "johnny-five": "latest",
         "socket.io": "^2.2.0"
     }

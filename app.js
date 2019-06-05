@@ -3,6 +3,7 @@ const app = express();
 const bodyParser = require('body-parser');
 const http = require('http').Server(app);
 const io = require('socket.io')(http);
+const inquirer = require('inquirer');
 
 var five = require('johnny-five'),
   potentiometer;
@@ -58,6 +59,27 @@ board.on('ready', function() {
   potentiometer.on('data', function() {
     console.log(this.value);
 
-    socket.emit('value', this.value);
+    io.emit('value', this.value);
   });
 });
+
+/**
+ * Reading value from commandline interactively
+ */
+
+getCmdValue = () => {
+  var questions = [
+    {
+      type: 'number',
+      name: 'value',
+      message: "What's the mock value?"
+    }
+  ];
+
+  inquirer.prompt(questions).then((answer) => {
+    io.emit('value', answer.value);
+    getCmdValue();
+  });
+};
+
+getCmdValue();
