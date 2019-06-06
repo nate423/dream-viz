@@ -6,7 +6,7 @@ const io = require('socket.io')(http);
 const inquirer = require('inquirer');
 
 var five = require('johnny-five'),
-  potentiometer;
+  fsr;
 
 const board = new five.Board();
 
@@ -43,23 +43,23 @@ http.listen(process.env.PORT || SERVER_PORT, () => {
 
 board.on('ready', function() {
   // Create a new `potentiometer` hardware instance.
-  potentiometer = new five.Sensor({
+  fsr = new five.Sensor({
     pin: 'A0',
-    freq: 250
+    freq: 20
   });
 
   // Inject the `sensor` hardware into
   // the Repl instance's context;
   // allows direct command line access
   board.repl.inject({
-    pot: potentiometer
+    pot: fsr
   });
 
   // "data" get the current reading from the potentiometer
-  potentiometer.on('data', function() {
-    console.log(this.value);
+  fsr.on('data', function() {
+    console.log(this.value + 20);
 
-    io.emit('value', this.value);
+    io.emit('value', this.value + 20);
   });
 });
 

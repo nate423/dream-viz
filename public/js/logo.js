@@ -205,7 +205,7 @@ logoImage.onload = function() {
   requestAnimationFrame(draw);
 };
 
-logoImage.src = 'profile.png';
+logoImage.src = 'profile-complex.png';
 
 socket.on('value', (value) => {
   ptmValue = value;
