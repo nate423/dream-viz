@@ -1,4 +1,3 @@
-const BezierEasing = require('bezier-easing');
 const socket = io();
 
 var WIDTH = 400 * 4;
@@ -9,11 +8,8 @@ var points = [];
 var canvas;
 var context;
 var t = 0;
-var jitter = 5;
-
-var ptmValue = 0;
-var ifChange = 0;
-var easeDur = 2000;
+var jitter = 0;
+var minJitter = 5;
 
 var lastMousePosition = { x: 0, y: 0 };
 var lastTime = new Date();
@@ -22,7 +18,7 @@ var delaunay;
 
 noise.seed(Math.random());
 
-function generatePoints(image, numPoints, times) {
+function generatePoints(image, numPoints) {
   var scratchCanvas = document.createElement('canvas');
   var scratchContext = scratchCanvas.getContext('2d');
 
@@ -50,7 +46,6 @@ function generatePoints(image, numPoints, times) {
 
     var p = [x, y];
     p.original = [x, y];
-    p.previous = [x, y];
     points.push(p);
   }
 
@@ -120,39 +115,6 @@ function dotColor(value) {
   return 'rgb(' + 255 + ',' + 0 + ',' + 255 + ')';
 }
 
-function easeTransition(point, easing) {
-  var start = Date.now();
-  (function loop() {
-    var p = (Date.now() - start) / easeDur;
-    if (p < 1) {
-      requestAnimationFrame(loop);
-      movePoint(point, easing(p));
-    }
-  })();
-}
-
-function movePoint(point, easing) {
-  point.previous[0] =
-    point.original[0] +
-    noise.perlin3(point.original[0], point.original[1], t / 2) *
-      ptmValue *
-      easing;
-  point.previous[1] =
-    point.original[1] +
-    noise.perlin3(point.original[0], point.original[1], t / 2 + 100) *
-      ptmValue *
-      easing;
-}
-
-function jitterPoint(point) {
-  point[0] =
-    point.previous[0] +
-    noise.perlin3(point.previous[0], point.previous[1], t / 2) * jitter;
-  point[1] =
-    point.previous[1] +
-    noise.perlin3(point.previous[0], point.previous[1], t / 2 + 100) * jitter;
-}
-
 function draw() {
   var current = new Date();
   var elapsed = current - lastTime;
@@ -162,20 +124,20 @@ function draw() {
   context.clearRect(0, 0, canvas.width, canvas.height);
 
   for (var i = 0; i < points.length; i++) {
-    // Check if needs to update the points
-
-    if (ifChange) {
-      easeTransition(points[i], BezierEasing(0.25, 0.1, 0.0, 1.0));
-    } else {
-      jitterPoint(points[i]);
-    }
+    points[i][0] =
+      points[i].original[0] +
+      noise.perlin3(points[i].original[0], points[i].original[1], t / 2) *
+        (jitter + minJitter);
+    points[i][1] =
+      points[i].original[1] +
+      noise.perlin3(points[i].original[0], points[i].original[1], t / 2 + 100) *
+        (jitter + minJitter);
   }
-
-  // Reset
-  ifChange = 0;
 
   drawPoints(points, context);
   requestAnimationFrame(draw);
+
+  jitter *= 0.95;
 }
 
 function mouseMove(event) {
@@ -183,7 +145,7 @@ function mouseMove(event) {
   var velocityY = event.clientY - lastMousePosition.y;
   var speed = Math.sqrt(velocityX * velocityX + velocityY * velocityY);
 
-  // jitter += speed / 2;
+  jitter += speed / 2;
 
   lastMousePosition.x = event.clientX;
   lastMousePosition.y = event.clientY;
@@ -192,7 +154,7 @@ function mouseMove(event) {
 var logoImage = new Image();
 
 logoImage.onload = function() {
-  // window.onmousemove = mouseMove;
+  window.onmousemove = mouseMove;
   canvas = document.getElementById('logocanvas');
   context = canvas.getContext('2d');
 
@@ -208,6 +170,6 @@ logoImage.onload = function() {
 logoImage.src = 'profile-complex.png';
 
 socket.on('value', (value) => {
-  ptmValue = value;
-  ifChange = 1;
+  console.log(value);
+  jitter = value;
 });

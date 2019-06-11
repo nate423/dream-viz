@@ -3,7 +3,6 @@ const app = express();
 const bodyParser = require('body-parser');
 const http = require('http').Server(app);
 const io = require('socket.io')(http);
-const inquirer = require('inquirer');
 
 var five = require('johnny-five'),
   fsr;
@@ -59,27 +58,10 @@ board.on('ready', function() {
   fsr.on('data', function() {
     console.log(this.value + 20);
 
+<<<<<<< HEAD
     io.emit('value', this.value + 20);
+=======
+    socket.emit('value', this.value);
+>>>>>>> parent of e61f1a2... Keep constant jitter and use bezier curve to ease the transition
   });
 });
-
-/**
- * Reading value from commandline interactively
- */
-
-getCmdValue = () => {
-  var questions = [
-    {
-      type: 'number',
-      name: 'value',
-      message: "What's the mock value?"
-    }
-  ];
-
-  inquirer.prompt(questions).then((answer) => {
-    io.emit('value', answer.value);
-    getCmdValue();
-  });
-};
-
-getCmdValue();
